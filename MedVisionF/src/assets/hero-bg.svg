@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="medGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--accent)" />
+      <stop offset="100%" stop-color="var(--accent-hover)" />
+    </linearGradient>
+  </defs>
+  <!-- Abstract Shapes -->
+  <circle cx="400" cy="300" r="250" fill="url(#medGrad)" opacity="0.1" />
+  <circle cx="600" cy="150" r="100" fill="url(#medGrad)" opacity="0.15" />
+  <!-- Medical Cross -->
+  <path d="M650 250 h20 v-20 h20 v20 h20 v20 h-20 v20 h-20 v-20 h-20 z" fill="url(#medGrad)" opacity="0.8" />
+  <!-- DNA Helix abstracted -->
+  <path d="M150 450 Q 200 400 250 450 T 350 450 T 450 450" fill="none" stroke="var(--accent)" stroke-width="5" opacity="0.3" stroke-dasharray="10, 10" />
+  <!-- Doctor silhouette -->
+  <path d="M400 450 C 350 450 300 500 300 600 L 500 600 C 500 500 450 450 400 450 Z" fill="var(--text-secondary)" opacity="0.5" />
+  <circle cx="400" cy="380" r="50" fill="var(--text-secondary)" opacity="0.5" />
+  <!-- Stethoscope around neck -->
+  <path d="M360 450 C 360 520 440 520 440 450" fill="none" stroke="var(--bg-card)" stroke-width="8" opacity="0.8" />
+</svg>

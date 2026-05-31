@@ -1,0 +1,913 @@
+.page {
+  display: flex;
+  margin-top: 68px;
+  height: calc(100vh - 68px);
+  overflow: hidden;
+  background: var(--background);
+  color: var(--text);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 10;
+}
+
+.sidebar {
+  position: relative;
+  width: 260px;
+  min-width: 260px;
+  height: 100%;
+  background: var(--surface);
+  border-right: 1px solid rgba(100, 100, 110, 0.08);
+  transition: width 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  padding-top: 18px;
+  z-index: 20;
+}
+
+.sidebarCollapsed {
+  width: 60px;
+  min-width: 60px;
+}
+
+.sidebarToggle {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 14px;
+  background: var(--surface-alt);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.toggleIcon {
+  transition: transform 0.25s ease;
+}
+
+.toggleIconCollapsed {
+  transform: rotate(180deg);
+}
+
+.newChatButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 56px 16px 16px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 16px;
+  background: var(--accent);
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.sidebarCollapsed .newChatButton span {
+  display: none;
+}
+
+.sidebarSessions {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 10px;
+  padding: 0 12px 24px;
+  margin-top: 16px;
+  overflow-y: auto;
+}
+
+.sessionLink {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s ease;
+}
+
+.sessionLink:hover {
+  background: rgba(100, 116, 243, 0.08);
+}
+
+.activeSession {
+  background: rgba(100, 116, 243, 0.14);
+  border-left: 4px solid var(--accent);
+}
+
+.sidebarCollapsed .sessionLink {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* When collapsed hide most sidebar content and keep only the toggle visible */
+.sidebarCollapsed .newChatButton,
+.sidebarCollapsed .sidebarSessions {
+  display: none;
+}
+
+.sidebarCollapsed .sidebarToggle {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sessionAvatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+.sessionDetails {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sidebarCollapsed .sessionDetails {
+  display: none;
+}
+
+.sessionTitle {
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sessionPreview {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-top: 6px;
+}
+
+.sessionTime {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.chatArea {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 24px 0px 24px;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chatContent {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.welcomeMode {
+  justify-content: center;
+}
+
+.activeMode {
+  justify-content: flex-start;
+}
+
+.welcomePanel {
+  margin: auto;
+  max-width: 680px;
+  width: 100%;
+  text-align: center;
+  padding: 24px 20px;
+}
+
+.welcomeIcon {
+  display: inline-flex;
+  color: var(--accent);
+  animation: pulse 2.4s ease-in-out infinite;
+  margin-bottom: 24px;
+}
+
+.welcomeTitle {
+  font-size: clamp(1.8rem, 2.4vw, 2.6rem);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.welcomeSubtitle {
+  margin: 16px auto 0;
+  color: var(--text-muted);
+  max-width: 520px;
+}
+
+.welcomeInputWrapper {
+  margin-top: 32px;
+}
+
+.messagesWrapper {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 6px;
+}
+
+.messagesList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 18px;
+}
+
+.stickyInput {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding-top: 18px;
+  background: rgba(var(--background-rgb, 255, 255, 255), 0.95);
+  backdrop-filter: blur(14px);
+  z-index: 2;
+}
+
+.inputZone {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid rgba(100, 116, 243, 0.12);
+  border-radius: 24px;
+  padding: 18px;
+}
+
+.optionRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.optionButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.optionButton:hover:not(:disabled) {
+  transform: scale(1.02);
+}
+
+.optionSelected {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.optionButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.textareaRow {
+  width: 100%;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 48px;
+  max-height: 144px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 24px;
+  resize: none;
+  background: transparent;
+  color: var(--text);
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.attachGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.imageButton {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+/* When sidebar is collapsed reduce avatar to avoid overflowing/misaligned icons */
+.sidebarCollapsed .sessionAvatar {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+/* Make option button content more compact */
+.optionButton span {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.optionButton svg,
+.imageButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.thumbnailContainer {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.thumbnailRemove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.sendButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 16px;
+  background: var(--accent);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.sendButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.disclaimer {
+  padding: 6px 0 10px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.disclaimer a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.disclaimer a:hover {
+  text-decoration: underline;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.85;
+  }
+}
+
+@media (max-width: 767px) {
+  .page {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 68px;
+    left: 0;
+    height: calc(100vh - 68px);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 30;
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .sidebarCollapsed {
+    width: 60px;
+  }
+
+  .chatArea {
+    padding: 16px;
+  }
+
+  .welcomePanel {
+    padding: 20px 16px;
+  }
+  .optionButton {
+    padding: 10px 10px;
+    gap: 8px;
+  }
+}
+
+/* Disease Detection Panel Styles */
+.diseaseContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 12px 16px;
+  overflow-y: auto;
+}
+
+.diseaseForm {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--surface);
+  border: 1px solid rgba(100, 116, 243, 0.12);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.modelRadioGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.modelRadioLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  cursor: pointer;
+  background: var(--surface-alt);
+  transition: all 0.2s ease;
+}
+
+.modelRadioActive {
+  border-color: var(--accent);
+  background: rgba(100, 116, 243, 0.05);
+}
+
+.modelRadioInput {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.modelRadioContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.modelRadioName {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.modelRadioDesc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.dropZone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--surface-alt);
+  transition: all 0.2s ease;
+  min-height: 180px;
+}
+
+.dropZone:hover {
+  border-color: var(--accent);
+  background: rgba(100, 116, 243, 0.02);
+}
+
+.dropZoneHasImage {
+  border-style: solid;
+  padding: 0;
+  overflow: hidden;
+  height: 240px;
+}
+
+.dropZonePreview {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.dropZoneImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.dropZoneOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.dropZonePreview:hover .dropZoneOverlay {
+  opacity: 1;
+}
+
+.dropZonePlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.dropZoneText {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin: 0;
+}
+
+.dropZoneText span {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.dropZoneSubtext {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.diseaseTextarea {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 20px;
+  resize: vertical;
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.diseaseErrorCard {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.16);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.errorLabel {
+  font-weight: 700;
+  color: #ef4444;
+  font-size: 0.9rem;
+}
+
+.errorText {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.analyzeButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 28px;
+  border: none;
+  border-radius: 16px;
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.analyzeButton:hover:not(:disabled) {
+  background: var(--accent-hover, #4f46e5);
+  transform: translateY(-1px);
+}
+
+.analyzeButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.analyzingLoader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Results State */
+.resultsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.resultsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 24px;
+}
+
+.resultsPanelLeft,
+.resultsPanelRight {
+  background: var(--surface);
+  border: 1px solid rgba(100, 116, 243, 0.12);
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panelTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+  border-bottom: 1px solid rgba(100, 100, 110, 0.08);
+  padding-bottom: 12px;
+}
+
+.resultModelBadge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 6px 12px;
+  background: rgba(100, 116, 243, 0.08);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  text-transform: uppercase;
+}
+
+.predictionHighlight {
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.12);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.predictionLabel {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.confidenceBadge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  background: #10b981;
+  color: white;
+  border-radius: 20px;
+}
+
+.probsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.subTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 0 0 4px 0;
+}
+
+.probRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.probLabelRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+}
+
+.probClassName {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.probValue {
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.probBarBg {
+  width: 100%;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.probBarFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.1, 0.7, 0.1, 1);
+}
+
+.doctorQuestionCard {
+  background: var(--surface-alt);
+  border-left: 4px solid var(--accent);
+  padding: 16px;
+  border-radius: 0 12px 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.questionCardLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.questionCardText {
+  margin: 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text);
+}
+
+.interpretationText {
+  font-size: 0.94rem;
+  line-height: 1.6;
+  color: var(--text);
+  overflow-y: auto;
+  max-height: 400px;
+  padding-right: 6px;
+}
+
+.panelActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.resetButton {
+  padding: 14px 28px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resetButton:hover {
+  background: var(--surface-alt);
+  border-color: var(--text-muted);
+}
+
+@media (max-width: 767px) {
+  .resultsGrid {
+    grid-template-columns: 1fr;
+  }
+  .modelRadioGroup {
+    grid-template-columns: 1fr;
+  }
+  .diseaseForm {
+    padding: 20px;
+  }
+}
+

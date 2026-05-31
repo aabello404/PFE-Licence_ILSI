@@ -1,0 +1,88 @@
+# ==========================================
+# 1. Multi-Project / Compiled Output (React & NestJS)
+# ==========================================
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/build/
+**/.nest/
+*.tsbuildinfo
+**/.swc/
+
+# ==========================================
+# 2. Python / AI Frameworks Specifics (AI Folder)
+# ==========================================
+**/venv/
+**/.venv/
+**/__pycache__/
+**/*.pyc
+**/.ipynb_checkpoints/
+**/.gated/
+**/models/*.pt
+**/models/*.pth
+
+# ==========================================
+# 3. Database & Prisma (Backend Specifics)
+# ==========================================
+**/src/generated/prisma/
+**/postgres_data/
+**/mysql_data/
+
+# ==========================================
+# 4. Logs & Diagnostics
+# ==========================================
+**/logs/
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+**/lerna-debug.log*
+.eslintcache
+.prettiercache
+
+# ==========================================
+# 5. Operating System Files
+# ==========================================
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# 6. Tests & Coverage
+# ==========================================
+**/coverage/
+**/.nyc_output/
+
+# ==========================================
+# 7. IDEs, Editors & Metadata
+# ==========================================
+**/.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+**/*.sw?
+
+# Visual Studio (MS Windows) project structures
+**/*.suo
+**/*.ntvs*
+**/*.njsproj
+**/*.sln
+
+# IDE - VSCode (Maintains tracking rules for extensions)
+**/.vscode/*
+!**/.vscode/extensions.json
+!**/.vscode/settings.json
+!**/.vscode/tasks.json
+!**/.vscode/launch.json
+
+# ==========================================
+# 8. Environment Variables, Secrets & Local Files
+# ==========================================
+**/*.local
+**/.env
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local

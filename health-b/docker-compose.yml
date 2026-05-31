@@ -1,0 +1,19 @@
+version: '3.9'
+
+
+services:
+  db-health:
+    image: postgres:16
+    container_name: Health
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin000
+      POSTGRES_DB: myhealth
+    ports:
+      - "5432:5432" 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

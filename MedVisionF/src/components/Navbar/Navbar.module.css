@@ -1,0 +1,217 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  z-index: 100;
+  background-color: color-mix(in srgb, var(--bg-primary) 85%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.navContainer {
+  width: 100vw;
+  margin: 0 auto;
+  padding: 0.75rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.brandIcon {
+  animation: pulse 2s infinite ease-in-out;
+}
+
+.desktopNav {
+  display: none;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .desktopNav {
+    display: flex;
+  }
+}
+
+.navLink {
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: color var(--transition-fast);
+  position: relative;
+}
+
+.navLink:hover {
+  color: var(--accent);
+}
+
+.navLink.active {
+  color: var(--accent);
+}
+
+.navLink.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--accent);
+  border-radius: var(--radius-full);
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.medbotBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--btn-bg, var(--accent));
+  color: var(--btn-text, white);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+}
+
+.medbotBtn:hover {
+  background-color: var(--btn-bg-hover, var(--accent-hover));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.medbotBtn:active {
+  transform: scale(0.97);
+}
+
+.userInfo {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .userInfo {
+    display: flex;
+  }
+}
+
+.userName {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+}
+
+.logoutBtn:hover {
+  color: var(--danger);
+  background-color: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+
+.signInBtn {
+  background-color: var(--btn-bg, var(--accent));
+  color: var(--btn-text, white);
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.signInBtn:hover {
+  background-color: var(--btn-bg-hover, var(--accent-hover));
+  box-shadow: var(--shadow);
+}
+
+.mobileMenuBtn {
+  display: block;
+  color: var(--text-primary);
+  padding: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .mobileMenuBtn {
+    display: none;
+  }
+}
+
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: var(--shadow);
+  animation: slideDown var(--transition-fast);
+}
+
+.mobileNavLink {
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  border-radius: var(--radius-md);
+}
+
+.mobileNavLink:hover {
+  background-color: var(--bg-secondary);
+}
+
+.mobileMedbotBtn, .mobileLogoutBtn, .mobileSignInBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  text-align: left;
+}
+
+.mobileMedbotBtn {
+  background-color: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+.mobileLogoutBtn {
+  background-color: color-mix(in srgb, var(--danger) 10%, transparent);
+  color: var(--danger);
+}
+
+.mobileSignInBtn {
+  background-color: var(--btn-bg, var(--accent));
+  color: var(--btn-text, white);
+  justify-content: center;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
