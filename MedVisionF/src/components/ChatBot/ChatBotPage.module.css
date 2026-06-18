@@ -1,4 +1,4 @@
-.page {
+﻿.page {
   display: flex;
   margin-top: 68px;
   height: calc(100vh - 68px);
@@ -880,6 +880,7 @@
   display: flex;
   justify-content: center;
   margin-top: 12px;
+  gap: 16px;
 }
 
 .resetButton {

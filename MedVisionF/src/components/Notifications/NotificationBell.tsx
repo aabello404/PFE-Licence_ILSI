@@ -32,7 +32,8 @@ const NotificationBell = () => {
       const data = await response.json();
       // Ensure it is sorted newest first using timestamp
       const sorted = (data as Notification[]).sort(
-        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
       );
       setNotifications(sorted);
     } catch (err: any) {
@@ -85,17 +86,22 @@ const NotificationBell = () => {
     if (!notification.isRead) {
       // Optimistic update
       setNotifications((prev) =>
-        prev.map((n) => (n.id === notification.id ? { ...n, isRead: true } : n))
+        prev.map((n) =>
+          n.id === notification.id ? { ...n, isRead: true } : n,
+        ),
       );
 
       try {
         const token = localStorage.getItem("medvision_token");
-        await fetch(`http://localhost:3000/notifications/${notification.id}/read`, {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
+        await fetch(
+          `http://localhost:3000/notifications/${notification.id}/read`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
       } catch (err) {
         console.error("Failed to mark notification as read:", err);
         // We can re-fetch to synchronize state in case of failure
@@ -105,7 +111,8 @@ const NotificationBell = () => {
 
     // 2. Navigation logic
     if (
-      (notification.type === "APPOINTMENT" || notification.type === "BOOKING") &&
+      (notification.type === "APPOINTMENT" ||
+        notification.type === "BOOKING") &&
       (currentUser.role === "DOCTOR" || currentUser.role === "RECEPTIONIST")
     ) {
       navigate("/doctor");
@@ -119,7 +126,7 @@ const NotificationBell = () => {
   const formatTime = (timeStr: string) => {
     try {
       return formatDistanceToNow(parseISO(timeStr), { addSuffix: true });
-    } catch (e) {
+    } catch {
       return timeStr;
     }
   };

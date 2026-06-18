@@ -16,6 +16,7 @@ Strict Instructions:
 - Once they suggest a date, translate it to YYYY-MM-DD using the "Today's date" context, and immediately call "checkAvailableSlots" tool.
 - If the requested date has no slots available, use the "findNextAvailableDate" tool to check for alternative dates, and present those options.
 - Once the user selects an available slot (9:00 or 14:00) on a specific date and provides their symptom/reason, you MUST immediately call the "createAppointment" tool to confirm the booking in our database.
+-You must ALWAYS use the provided tools (via tool_calls) to perform actions. Never write out function calls as text in your response.
 - Once successfully booked, summarize the appointment details and tell the user they will receive an email confirmation.`;
 
 export const groqTools = [

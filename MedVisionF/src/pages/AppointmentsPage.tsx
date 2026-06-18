@@ -6,8 +6,12 @@ import { CalendarIcon } from "../components/Icons";
 import styles from "./AppointmentsPage.module.css";
 
 const AppointmentsPage = () => {
-  const { appointments, setAppointments, addAppointment, updateAppointmentStatus } =
-    useAppointmentStore();
+  const {
+    appointments,
+    setAppointments,
+    addAppointment,
+    updateAppointmentStatus,
+  } = useAppointmentStore();
   const [filter, setFilter] = useState<
     "All" | "Upcoming" | "Completed" | "Cancelled"
   >("All");
@@ -29,8 +33,7 @@ const AppointmentsPage = () => {
           id: appt.id.toString(),
           patientId: appt.patientId.toString(),
           patientName:
-            `${appt.patient?.firstName} ${appt.patient?.lastName}` ||
-            "Unknown",
+            `${appt.patient?.firstName} ${appt.patient?.lastName}` || "Unknown",
           doctorId: appt.doctorId.toString(),
           doctorName:
             `Dr. ${appt.doctor?.user?.firstName} ${appt.doctor?.user?.lastName}` ||
@@ -87,7 +90,7 @@ const AppointmentsPage = () => {
         if (!response.ok) throw new Error("Failed to cancel appointment");
         updateAppointmentStatus(id, "cancelled");
         showToast("Appointment cancelled successfully");
-      } catch (error) {
+      } catch {
         showToast("Error cancelling appointment. Please try again.");
       }
     }
@@ -118,7 +121,7 @@ const AppointmentsPage = () => {
       addAppointment(newAppointment);
       setIsFormOpen(false);
       showToast("Appointment request sent successfully!");
-    } catch (error) {
+    } catch {
       showToast("Error booking appointment. Please try again.");
     }
   };

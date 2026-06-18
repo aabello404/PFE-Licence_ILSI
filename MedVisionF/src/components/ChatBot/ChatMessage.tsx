@@ -1,10 +1,11 @@
-import React from 'react';
-import { format } from 'date-fns';
-import { BotIcon, StethoscopeIcon, MicroscopeIcon } from '../Icons';
-import { ChatMessage as BaseChatMessage } from '../../types';
-import styles from './ChatMessage.module.css';
+import React from "react";
+import { format } from "date-fns";
+import { BotIcon, StethoscopeIcon, MicroscopeIcon } from "../Icons";
+import { ChatMessage as BaseChatMessage } from "../../types";
+import { renderMarkdown } from "./renderMarkdown";
+import styles from "./ChatMessage.module.css";
 
-type ChatOption = 'health' | 'disease';
+type ChatOption = "health" | "disease";
 
 interface MessageWithOption extends BaseChatMessage {
   option?: ChatOption;
@@ -18,7 +19,7 @@ interface ChatMessageProps {
 const renderInlineText = (text: string): React.ReactNode[] => {
   const fragments = text.split(/(\*\*[^*]+\*\*)/g);
   return fragments.map((fragment, index) => {
-    if (fragment.startsWith('**') && fragment.endsWith('**')) {
+    if (fragment.startsWith("**") && fragment.endsWith("**")) {
       return (
         <strong key={index} className={styles.bold}>
           {fragment.slice(2, -2)}
@@ -29,69 +30,29 @@ const renderInlineText = (text: string): React.ReactNode[] => {
   });
 };
 
-export const renderMarkdown = (text: string): React.ReactNode => {
-  const lines = text.split(/\r?\n/);
-  const elements: React.ReactNode[] = [];
-  let listItems: string[] = [];
-
-  const flushList = () => {
-    if (listItems.length === 0) return null;
-    const listEl = (
-      <ul className={styles.markdownList} key={`list-${elements.length}`}>
-        {listItems.map((item, index) => (
-          <li key={index} className={styles.markdownListItem}>
-            {renderInlineText(item)}
-          </li>
-        ))}
-      </ul>
-    );
-    listItems = [];
-    return listEl;
-  };
-
-  lines.forEach((line, index) => {
-    if (line.startsWith('- ')) {
-      listItems.push(line.slice(2));
-      return;
-    }
-    if (listItems.length > 0) {
-      elements.push(flushList());
-    }
-    if (line.trim().length === 0) {
-      elements.push(<div key={`br-${index}`} className={styles.lineBreak} />);
-      return;
-    }
-    elements.push(
-      <p key={`p-${index}`} className={styles.paragraph}>
-        {renderInlineText(line)}
-      </p>,
-    );
-  });
-
-  if (listItems.length > 0) {
-    elements.push(flushList());
-  }
-
-  return <>{elements}</>;
-};
-
-const ChatMessage: React.FC<ChatMessageProps> = ({ message, isTyping = false }) => {
-  const isUser = message.from === 'user';
+const ChatMessage: React.FC<ChatMessageProps> = ({
+  message,
+  isTyping = false,
+}) => {
+  const isUser = message.from === "user";
   const optionLabel =
-    message.option === 'disease'
-      ? 'Disease'
-      : message.option === 'health'
-      ? 'Symptoms'
-      : undefined;
+    message.option === "disease"
+      ? "Disease"
+      : message.option === "health"
+        ? "Symptoms"
+        : undefined;
 
-  const optionIcon = message.option === 'disease' ? (
-    <MicroscopeIcon size={14} />
-  ) : message.option === 'health' ? (
-    <StethoscopeIcon size={14} />
-  ) : null;
+  const optionIcon =
+    message.option === "disease" ? (
+      <MicroscopeIcon size={14} />
+    ) : message.option === "health" ? (
+      <StethoscopeIcon size={14} />
+    ) : null;
 
   return (
-    <div className={`${styles.messageRow} ${isUser ? styles.userRow : styles.botRow}`}>
+    <div
+      className={`${styles.messageRow} ${isUser ? styles.userRow : styles.botRow}`}
+    >
       {!isUser && (
         <div className={styles.botAvatar}>
           <BotIcon size={20} />
@@ -104,9 +65,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isTyping = false }) 
             <span>{optionLabel}</span>
           </div>
         )}
-        <div className={`${styles.bubble} ${isUser ? styles.userBubble : styles.botBubble}`}>
+        <div
+          className={`${styles.bubble} ${isUser ? styles.userBubble : styles.botBubble}`}
+        >
           {message.image && (
-            <img src={message.image} alt="Chat attachment" className={styles.messageImage} />
+            <img
+              src={message.image}
+              alt="Chat attachment"
+              className={styles.messageImage}
+            />
           )}
           <div className={styles.messageText}>
             {isTyping ? (
@@ -119,7 +86,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isTyping = false }) 
               renderMarkdown(message.text)
             )}
           </div>
-          <span className={styles.timestamp}>{format(message.timestamp, 'h:mm a')}</span>
+          <span className={styles.timestamp}>
+            {format(message.timestamp, "h:mm a")}
+          </span>
         </div>
       </div>
     </div>

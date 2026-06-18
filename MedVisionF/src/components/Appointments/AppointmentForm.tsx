@@ -10,7 +10,7 @@ interface Props {
 
 const AppointmentForm = ({ onClose, onSubmit }: Props) => {
   const { currentUser } = useAuth();
- 
+
   const backendDoctorId = 1;
   const allSlots = ["9:00", "14:00"];
 
@@ -56,7 +56,7 @@ const AppointmentForm = ({ onClose, onSubmit }: Props) => {
         if (time && !available.includes(time)) {
           setTime("");
         }
-      } catch (error) {
+      } catch {
         if (!isActive) return;
         setAvailableSlots([]);
         setTime("");
@@ -87,12 +87,10 @@ const AppointmentForm = ({ onClose, onSubmit }: Props) => {
     e.preventDefault();
     if (!date || !time || !reason || !currentUser) return;
 
-    
-
     onSubmit({
       date,
       time,
-      reason
+      reason,
     });
   };
 

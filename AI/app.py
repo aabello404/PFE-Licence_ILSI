@@ -1,7 +1,14 @@
 import os
 import io
+import base64
+
+import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+from pytorch_grad_cam import GradCAM
+from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+from pytorch_grad_cam.utils.image import show_cam_on_image
 from PIL import Image
 from flask import Flask, request, jsonify, render_template
 from torchvision import transforms, models
@@ -152,6 +159,36 @@ def preprocess(image_bytes: bytes, model_name: str) -> torch.Tensor:
     return tensor.to(DEVICE)
 
 
+def generate_gradcam(model: nn.Module, tensor: torch.Tensor, image_bytes: bytes, target_index: int) -> str:
+    # Use pytorch-grad-cam utilities to produce the same visualization
+    # Denormalize tensor to [0,1] RGB image expected by show_cam_on_image
+    np_tensor = tensor[0].cpu().detach().permute(1, 2, 0).numpy()
+    # inverse normalization: x = x*std + mean
+    mean = np.array(MEAN).reshape(1, 1, 3)
+    std = np.array(STD).reshape(1, 1, 3)
+    rgb_img = (np_tensor * std) + mean
+    rgb_img = np.clip(rgb_img, 0, 1)
+
+    # Create GradCAM object and compute grayscale CAM
+    target_layers = [model.features[-1]] if hasattr(model, 'features') else [model]
+    cam = GradCAM(model=model, target_layers=target_layers)
+    targets = [ClassifierOutputTarget(target_index)]
+    grayscale_cam = cam(input_tensor=tensor, targets=targets)[0, :]
+
+    # show_cam_on_image expects RGB image in range [0,1]
+    cam_image = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
+
+    # Convert to PNG bytes
+    overlay_pil = Image.fromarray(cam_image)
+    buffered = io.BytesIO()
+    overlay_pil.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+    buffered = io.BytesIO()
+    overlay.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+
 # ─────────────────────────────────────────────
 #  ROUTES
 # ─────────────────────────────────────────────
@@ -174,11 +211,10 @@ def predict():
         model  = get_model(model_name)
         tensor = preprocess(image_bytes, model_name)
 
-        with torch.no_grad():
-            logits = model(tensor)                      # (1, num_classes)
-            probs  = torch.softmax(logits, dim=1)[0]    # (num_classes,)
-            pred   = torch.argmax(probs).item()
-            conf   = probs[pred].item()
+        logits = model(tensor)                      # (1, num_classes)
+        probs  = torch.softmax(logits, dim=1)[0]    # (num_classes,)
+        pred   = torch.argmax(probs).item()
+        conf   = probs[pred].item()
 
         labels = LC25000_CLASSES if model_name == "lc25000" else APTOS_CLASSES
 
@@ -186,11 +222,14 @@ def predict():
         all_probs = {labels[i]: round(probs[i].item() * 100, 2)
                      for i in range(len(labels))}
 
+        gradcam_base64 = generate_gradcam(model, tensor, image_bytes, pred)
+
         return jsonify({
-            "model"      : model_name,
-            "prediction" : labels[pred],
-            "confidence" : round(conf * 100, 2),
-            "all_probs"  : all_probs,
+            "model"                 : model_name,
+            "prediction"            : labels[pred],
+            "confidence"            : round(conf * 100, 2),
+            "all_probs"             : all_probs,
+            "gradcam_image_base64"  : gradcam_base64,
         })
 
     except FileNotFoundError as e:

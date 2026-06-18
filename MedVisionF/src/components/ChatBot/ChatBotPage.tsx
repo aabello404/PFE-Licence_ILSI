@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { useChatStore } from "../../store/useChatStore";
@@ -14,7 +14,8 @@ import {
   ChevronLeftIcon,
   MenuIcon,
 } from "../Icons";
-import ChatMessage, { renderMarkdown } from "./ChatMessage";
+import ChatMessage from "./ChatMessage";
+import { renderMarkdown } from "./renderMarkdown";
 import styles from "./ChatBotPage.module.css";
 
 type ChatOption = "health" | "disease";
@@ -67,9 +68,13 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
   const [isTyping, setIsTyping] = useState(false);
 
   // Disease detection states
-  const [diseaseModel, setDiseaseModel] = useState<"lc25000" | "aptos" | null>(null);
+  const [diseaseModel, setDiseaseModel] = useState<"lc25000" | "aptos" | null>(
+    null,
+  );
   const [diseaseImage, setDiseaseImage] = useState<File | null>(null);
-  const [diseaseImagePreview, setDiseaseImagePreview] = useState<string | null>(null);
+  const [diseaseImagePreview, setDiseaseImagePreview] = useState<string | null>(
+    null,
+  );
   const [doctorQuestion, setDoctorQuestion] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
@@ -82,13 +87,13 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
     };
     interpretation: string;
     doctor_message: string;
+    report_base64?: string;
   } | null>(null);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const diseaseFileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
 
   const activeSession = useMemo(
     () => sessions.find((session) => session.id === sessionId),
@@ -221,7 +226,6 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
       timestamp: new Date(),
     };
 
-    let serverSessionId: number | null = null;
     let finalSessionId: string;
 
     // If there is an existing session id in the URL and it maps to a session,
@@ -247,12 +251,12 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
         }
 
         const created = await res.json();
-        serverSessionId = created?.id ?? null;
-        if (serverSessionId == null) {
+        const createdSessionId = created?.id;
+        if (createdSessionId == null) {
           throw new Error("Server returned no session id");
         }
 
-        finalSessionId = String(serverSessionId);
+        finalSessionId = String(createdSessionId);
 
         // Update URL to canonical server session id
         navigate(`/chat/${finalSessionId}`, { replace: true });
@@ -349,7 +353,7 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
             if (parsed.content) {
               appendToken(finalSessionId, botMessageId, parsed.content);
             }
-          } catch (err) {
+          } catch {
             // ignore parsing errors
           }
         }
@@ -397,7 +401,10 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
 
       if (!aiResponse.ok) {
         const errData = await aiResponse.json().catch(() => ({}));
-        throw new Error(errData.error || `AI inference server error: status ${aiResponse.status}`);
+        throw new Error(
+          errData.error ||
+            `AI inference server error: status ${aiResponse.status}`,
+        );
       }
 
       const aiResult = await aiResponse.json();
@@ -417,12 +424,16 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
             all_probs: aiResult.all_probs,
           },
           doctor_message: doctorQuestion,
+          gradcam_image_base64: aiResult.gradcam_image_base64,
         }),
       });
 
       if (!groqResponse.ok) {
         const errData = await groqResponse.json().catch(() => ({}));
-        throw new Error(errData.error || `Interpretation server error: status ${groqResponse.status}`);
+        throw new Error(
+          errData.error ||
+            `Interpretation server error: status ${groqResponse.status}`,
+        );
       }
 
       const groqResult = await groqResponse.json();
@@ -436,10 +447,14 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
         },
         interpretation: groqResult.interpretation,
         doctor_message: doctorQuestion,
+        report_base64: groqResult.report_base64,
       });
     } catch (err: any) {
       console.error("Disease detection failed:", err);
-      setAnalysisError(err.message || "An unexpected error occurred during diagnostic analysis.");
+      setAnalysisError(
+        err.message ||
+          "An unexpected error occurred during diagnostic analysis.",
+      );
     } finally {
       setIsAnalyzing(false);
     }
@@ -618,7 +633,10 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
           {selectedOption === "disease" ? (
             <div className={styles.diseaseContainer}>
               {/* Option Row */}
-              <div className={styles.optionRow} style={{ marginBottom: "24px" }}>
+              <div
+                className={styles.optionRow}
+                style={{ marginBottom: "24px" }}
+              >
                 <button
                   type="button"
                   className={styles.optionButton}
@@ -639,20 +657,23 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
                 )}
               </div>
 
-
               {analysisResult ? (
                 /* State 2: Results Display */
                 <div className={styles.resultsWrapper}>
                   <div className={styles.resultsGrid}>
                     {/* Left Panel: AI model output */}
                     <div className={styles.resultsPanelLeft}>
-                      <h3 className={styles.panelTitle}>AI Classification Output</h3>
+                      <h3 className={styles.panelTitle}>
+                        AI Classification Output
+                      </h3>
                       <div className={styles.resultModelBadge}>
                         Model: {analysisResult.ai_result.model.toUpperCase()}
                       </div>
-                      
+
                       <div className={styles.predictionHighlight}>
-                        <div className={styles.predictionLabel}>{analysisResult.ai_result.prediction}</div>
+                        <div className={styles.predictionLabel}>
+                          {analysisResult.ai_result.prediction}
+                        </div>
                         <div className={styles.confidenceBadge}>
                           {analysisResult.ai_result.confidence}% Confidence
                         </div>
@@ -660,31 +681,43 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
 
                       <div className={styles.probsContainer}>
                         <h4 className={styles.subTitle}>Class Probabilities</h4>
-                        {Object.entries(analysisResult.ai_result.all_probs).map(([cls, prob]) => (
-                          <div key={cls} className={styles.probRow}>
-                            <div className={styles.probLabelRow}>
-                              <span className={styles.probClassName}>{cls}</span>
-                              <span className={styles.probValue}>{prob}%</span>
+                        {Object.entries(analysisResult.ai_result.all_probs).map(
+                          ([cls, prob]) => (
+                            <div key={cls} className={styles.probRow}>
+                              <div className={styles.probLabelRow}>
+                                <span className={styles.probClassName}>
+                                  {cls}
+                                </span>
+                                <span className={styles.probValue}>
+                                  {prob}%
+                                </span>
+                              </div>
+                              <div className={styles.probBarBg}>
+                                <div
+                                  className={styles.probBarFill}
+                                  style={{ width: `${prob}%` }}
+                                />
+                              </div>
                             </div>
-                            <div className={styles.probBarBg}>
-                              <div
-                                className={styles.probBarFill}
-                                style={{ width: `${prob}%` }}
-                              />
-                            </div>
-                          </div>
-                        ))}
+                          ),
+                        )}
                       </div>
                     </div>
 
                     {/* Right Panel: Groq interpretation */}
                     <div className={styles.resultsPanelRight}>
-                      <h3 className={styles.panelTitle}>Clinical AI Interpretation</h3>
-                      
+                      <h3 className={styles.panelTitle}>
+                        Clinical AI Interpretation
+                      </h3>
+
                       {analysisResult.doctor_message && (
                         <div className={styles.doctorQuestionCard}>
-                          <span className={styles.questionCardLabel}>Doctor's Question:</span>
-                          <p className={styles.questionCardText}>"{analysisResult.doctor_message}"</p>
+                          <span className={styles.questionCardLabel}>
+                            Doctor's Question:
+                          </span>
+                          <p className={styles.questionCardText}>
+                            "{analysisResult.doctor_message}"
+                          </p>
                         </div>
                       )}
 
@@ -695,6 +728,15 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
                   </div>
 
                   <div className={styles.panelActions}>
+                    {analysisResult.report_base64 && (
+                      <a
+                        href={`data:application/pdf;base64,${analysisResult.report_base64}`}
+                        download={`medvision-disease-report.pdf`}
+                        className={styles.resetButton}
+                      >
+                        Download PDF Report
+                      </a>
+                    )}
                     <button
                       type="button"
                       className={styles.resetButton}
@@ -715,7 +757,9 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
                   <div className={styles.formSection}>
                     <h3 className={styles.sectionTitle}>1. Select AI Model</h3>
                     <div className={styles.modelRadioGroup}>
-                      <label className={`${styles.modelRadioLabel} ${diseaseModel === "lc25000" ? styles.modelRadioActive : ""}`}>
+                      <label
+                        className={`${styles.modelRadioLabel} ${diseaseModel === "lc25000" ? styles.modelRadioActive : ""}`}
+                      >
                         <input
                           type="radio"
                           name="disease-model"
@@ -727,11 +771,15 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
                         />
                         <div className={styles.modelRadioContent}>
                           <span className={styles.modelRadioName}>LC25000</span>
-                          <span className={styles.modelRadioDesc}>Lung & Colon Cancer · 5 classes</span>
+                          <span className={styles.modelRadioDesc}>
+                            Lung & Colon Cancer · 5 classes
+                          </span>
                         </div>
                       </label>
 
-                      <label className={`${styles.modelRadioLabel} ${diseaseModel === "aptos" ? styles.modelRadioActive : ""}`}>
+                      <label
+                        className={`${styles.modelRadioLabel} ${diseaseModel === "aptos" ? styles.modelRadioActive : ""}`}
+                      >
                         <input
                           type="radio"
                           name="disease-model"
@@ -743,14 +791,18 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
                         />
                         <div className={styles.modelRadioContent}>
                           <span className={styles.modelRadioName}>APTOS</span>
-                          <span className={styles.modelRadioDesc}>Diabetic Retinopathy · 5 DR grades</span>
+                          <span className={styles.modelRadioDesc}>
+                            Diabetic Retinopathy · 5 DR grades
+                          </span>
                         </div>
                       </label>
                     </div>
                   </div>
 
                   <div className={styles.formSection}>
-                    <h3 className={styles.sectionTitle}>2. Upload Diagnostic Image</h3>
+                    <h3 className={styles.sectionTitle}>
+                      2. Upload Diagnostic Image
+                    </h3>
                     <div
                       className={`${styles.dropZone} ${diseaseImagePreview ? styles.dropZoneHasImage : ""}`}
                       onDragOver={(e) => e.preventDefault()}
@@ -762,7 +814,9 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
                           handleDiseaseImageSelect(file);
                         }
                       }}
-                      onClick={() => !isAnalyzing && diseaseFileInputRef.current?.click()}
+                      onClick={() =>
+                        !isAnalyzing && diseaseFileInputRef.current?.click()
+                      }
                     >
                       <input
                         ref={diseaseFileInputRef}
@@ -790,16 +844,21 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
                         <div className={styles.dropZonePlaceholder}>
                           <ImageUploadIcon size={36} color="var(--accent)" />
                           <p className={styles.dropZoneText}>
-                            Drag and drop a diagnostic image here, or <span>browse</span>
+                            Drag and drop a diagnostic image here, or{" "}
+                            <span>browse</span>
                           </p>
-                          <span className={styles.dropZoneSubtext}>Supports JPG, PNG, DICOM (image formats)</span>
+                          <span className={styles.dropZoneSubtext}>
+                            Supports JPG, PNG, DICOM (image formats)
+                          </span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   <div className={styles.formSection}>
-                    <h3 className={styles.sectionTitle}>3. Clinical Notes / Question (Optional)</h3>
+                    <h3 className={styles.sectionTitle}>
+                      3. Clinical Notes / Question (Optional)
+                    </h3>
                     <textarea
                       value={doctorQuestion}
                       onChange={(e) => setDoctorQuestion(e.target.value)}
@@ -812,7 +871,9 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
 
                   {analysisError && (
                     <div className={styles.diseaseErrorCard}>
-                      <span className={styles.errorLabel}>Analysis Failed:</span>
+                      <span className={styles.errorLabel}>
+                        Analysis Failed:
+                      </span>
                       <p className={styles.errorText}>{analysisError}</p>
                     </div>
                   )}
@@ -882,7 +943,6 @@ const ChatBotPage: React.FC<ChatBotPageProps> = ({ sessionId }) => {
           </div>
         )}
       </section>
-
     </div>
   );
 };
